@@ -25,12 +25,19 @@ public class AIPathFollower : MonoBehaviour
 
     [SerializeField] private Color pathColor = Color.magenta;
 
-    [Header("Finish")]
+    [Header("Braking")]
+    [Tooltip("Brzdenie pred štartom a po dokončení pretekov.")]
     [SerializeField, Min(0.1f)]
     private float finishBraking = 10f;
 
     private Rigidbody rb;
     private RaceProgress raceProgress;
+    private bool raceStarted = false;
+
+    public void SetRaceStarted(bool started)
+    {
+        raceStarted = started;
+    }
 
     private void Awake()
     {
@@ -61,7 +68,7 @@ public class AIPathFollower : MonoBehaviour
         {
             Debug.LogWarning(
                 $"{name}: Chýba RaceProgress. " +
-                "AI bude jazdiť bez zastavenia v cieli.",
+                "AI nebude vedieť zastaviť po dokončení pretekov.",
                 this
             );
         }
@@ -69,6 +76,14 @@ public class AIPathFollower : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Pred odpočítaním AI čaká.
+        if (!raceStarted)
+        {
+            BrakeAfterFinish();
+            return;
+        }
+
+        // Po dokončení svojich kôl AI zabrzdí.
         if (raceProgress != null && raceProgress.Finished)
         {
             BrakeAfterFinish();
@@ -94,6 +109,7 @@ public class AIPathFollower : MonoBehaviour
             checkedPoints++;
         }
 
+        // Nespomaľuje pri približovaní ku každému bodu.
         Vector3 desiredVelocity =
             toTarget.normalized * moveSpeed;
 
@@ -128,7 +144,7 @@ public class AIPathFollower : MonoBehaviour
             finishBraking * Time.fixedDeltaTime
         );
 
-        // Brzdí iba vodorovný pohyb.
+        // Zvislý pohyb zostáva na gravitácii a kolíziách.
         rb.AddForce(
             velocityChange,
             ForceMode.VelocityChange
