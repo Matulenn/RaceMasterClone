@@ -18,7 +18,12 @@ public class RaceProgress : MonoBehaviour
     public int NextCheckpointIndex => nextCheckpointIndex;
     public int CompletedLaps => completedLaps;
     public int TotalLaps => totalLaps;
+    public int CheckpointCount => checkpointCount;
+
+    public bool LapTrackingStarted => lapTrackingStarted;
     public bool Finished => finished;
+
+    public event System.Action<RaceProgress> FinishedRace;
 
     private void Awake()
     {
@@ -39,11 +44,12 @@ public class RaceProgress : MonoBehaviour
             return;
         }
 
-        // Iný než očakávaný checkpoint sa nezapočíta.
+        // Započíta iba ďalší očakávaný checkpoint.
         if (checkpointIndex != nextCheckpointIndex)
             return;
 
-        // Prvý prejazd štartom ešte nie je dokončené kolo.
+        // Prvý prejazd štartom začne meranie kôl.
+        // Ešte sa nepočíta ako dokončené kolo.
         if (!lapTrackingStarted)
         {
             lapTrackingStarted = true;
@@ -57,6 +63,7 @@ public class RaceProgress : MonoBehaviour
             return;
         }
 
+        // Návrat na štart po všetkých checkpointoch.
         if (checkpointIndex == 0)
         {
             completedLaps++;
@@ -76,6 +83,7 @@ public class RaceProgress : MonoBehaviour
                     this
                 );
 
+                FinishedRace?.Invoke(this);
                 return;
             }
         }
