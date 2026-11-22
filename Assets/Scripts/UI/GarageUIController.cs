@@ -27,6 +27,8 @@ public class GarageUIController : MonoBehaviour
     {
         PlayerDataManager.Instance.OnDataChanged += RefreshUI;
         RefreshUI();
+        FirebaseManager.Instance.OnStatusChanged += UpdateFirebaseStatus;
+UpdateFirebaseStatus(FirebaseManager.Instance.LastStatusMessage, FirebaseManager.Instance.LastStatusIsError);
     }
 
     private void OnDisable()
@@ -35,6 +37,8 @@ public class GarageUIController : MonoBehaviour
         {
             PlayerDataManager.Instance.OnDataChanged -= RefreshUI;
         }
+        if (FirebaseManager.Instance != null)
+    FirebaseManager.Instance.OnStatusChanged -= UpdateFirebaseStatus;
     }
 
     public void RefreshUI()
@@ -103,4 +107,10 @@ public class GarageUIController : MonoBehaviour
             mainMenuPanel.SetActive(true);
         }
     }
+    private void UpdateFirebaseStatus(string message, bool isError)
+{
+    if (statusText == null) return;
+    statusText.text = message;
+    statusText.color = isError ? new Color(1f, 0.35f, 0.35f) : new Color(0.55f, 0.95f, 0.65f);
+}
 }

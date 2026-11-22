@@ -11,16 +11,30 @@ public enum UpgradeType
 public class PlayerDataManager : MonoBehaviour
 {
     private static PlayerDataManager instance;
+    private static bool isQuitting;
     public static PlayerDataManager Instance
     {
         get
         {
+            if (isQuitting) return null;
             if (instance == null)
             {
                 GameObject obj = new GameObject("PlayerDataManager");
                 instance = obj.AddComponent<PlayerDataManager>();
             }
             return instance;
+        }
+    }
+    private void OnApplicationQuit()
+    {
+        isQuitting = true;
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            isQuitting = true;
         }
     }
 
@@ -97,6 +111,7 @@ public class PlayerDataManager : MonoBehaviour
         }
 
         SaveLocalData();
+        FirebaseManager.Instance.SavePlayerProgress();
         OnDataChanged?.Invoke();
         return true;
     }
