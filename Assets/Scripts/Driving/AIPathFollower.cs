@@ -3,8 +3,13 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class AIPathFollower : MonoBehaviour
 {
+    [Header("Path")]
     [SerializeField] private AIPath path;
 
+    [SerializeField, Min(0)]
+    private int currentPointIndex;
+
+    [Header("Movement")]
     [SerializeField, Min(0.1f)]
     private float moveSpeed = 4f;
 
@@ -14,8 +19,11 @@ public class AIPathFollower : MonoBehaviour
     [SerializeField, Min(0.1f)]
     private float reachDistance = 0.8f;
 
-    [SerializeField, Min(0)]
-    private int currentPointIndex;
+    [Header("Driving Line")]
+    [Tooltip("Záporné = vľavo, kladné = vpravo v smere jazdy.")]
+    [SerializeField] private float laneOffset = 0f;
+
+    [SerializeField] private Color pathColor = Color.magenta;
 
     private Rigidbody rb;
 
@@ -52,9 +60,6 @@ public class AIPathFollower : MonoBehaviour
         currentPointIndex %= path.PointCount;
 
         Vector3 toTarget = GetHorizontalTargetDirection();
-
-        // Preskočí dosiahnuté alebo tesne susediace body.
-        // Limit zabraňuje nekonečnému cyklu.
         int checkedPoints = 0;
 
         while (toTarget.magnitude <= reachDistance &&
@@ -67,7 +72,6 @@ public class AIPathFollower : MonoBehaviour
             checkedPoints++;
         }
 
-        // Požadovaná rýchlosť už neklesá pri približovaní k bodu.
         Vector3 desiredVelocity =
             toTarget.normalized * moveSpeed;
 
@@ -88,17 +92,49 @@ public class AIPathFollower : MonoBehaviour
             acceleration * Time.fixedDeltaTime
         );
 
-        // Zvislý pohyb zostáva na gravitácii a kolíziách.
         rb.AddForce(
             velocityChange,
             ForceMode.VelocityChange
         );
     }
 
+    private Vector3 GetOffsetPoint(int index)
+    {
+        int count = path.PointCount;
+
+        Vector3 current = path.GetPoint(index);
+
+        int previousIndex = (index - 1 + count) % count;
+        int nextIndex = (index + 1) % count;
+
+        Vector3 forward =
+            path.GetPoint(nextIndex) -
+            path.GetPoint(previousIndex);
+
+        forward.y = 0f;
+
+        // Záloha pri zhodných susedných bodoch.
+        if (forward.sqrMagnitude < 0.0001f)
+        {
+            forward = path.GetPoint(nextIndex) - current;
+            forward.y = 0f;
+        }
+
+        if (forward.sqrMagnitude < 0.0001f)
+            return current;
+
+        Vector3 right = Vector3.Cross(
+            Vector3.up,
+            forward.normalized
+        ).normalized;
+
+        return current + right * laneOffset;
+    }
+
     private Vector3 GetHorizontalTargetDirection()
     {
         Vector3 direction =
-            path.GetPoint(currentPointIndex) - rb.position;
+            GetOffsetPoint(currentPointIndex) - rb.position;
 
         direction.y = 0f;
 
@@ -110,16 +146,31 @@ public class AIPathFollower : MonoBehaviour
         if (path == null || path.PointCount < 2)
             return;
 
-        int index = Mathf.Clamp(
+        Gizmos.color = pathColor;
+
+        for (int i = 0; i < path.PointCount; i++)
+        {
+            Vector3 current = GetOffsetPoint(i);
+
+            Vector3 next = GetOffsetPoint(
+                (i + 1) % path.PointCount
+            );
+
+            Gizmos.DrawLine(current, next);
+            Gizmos.DrawSphere(current, 0.12f);
+        }
+
+        int targetIndex = Mathf.Clamp(
             currentPointIndex,
             0,
             path.PointCount - 1
         );
 
         Gizmos.color = Color.red;
+
         Gizmos.DrawLine(
             transform.position,
-            path.GetPoint(index)
+            GetOffsetPoint(targetIndex)
         );
     }
 }
