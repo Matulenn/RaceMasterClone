@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class RaceManager : MonoBehaviour
 {
-    [Header("Racers")]
-    [SerializeField] private AIPathFollower[] aiRacers;
+    [Header("All Racers - player and AI")]
+    [SerializeField] private RaceProgress[] racers;
 
     [Header("UI")]
     [SerializeField] private TMP_Text countdownText;
@@ -22,7 +22,9 @@ public class RaceManager : MonoBehaviour
     [SerializeField] private bool raceFinished;
     [SerializeField] private float elapsedTime;
 
-    private RaceProgress[] racerProgress;
+    private AIPathFollower[] aiControllers;
+    private PlayerRaceController[] playerControllers;
+
     private float startTime;
 
     public bool RaceStarted => raceStarted;
@@ -36,48 +38,63 @@ public class RaceManager : MonoBehaviour
         raceFinished = false;
         elapsedTime = 0f;
 
-        if (aiRacers == null || aiRacers.Length == 0)
+        if (racers == null || racers.Length == 0)
         {
-            Debug.LogError(
-                "RaceManager: Priraď AI pretekárov.",
-                this
-            );
-
-            enabled = false;
+            DisableWithError("Priraď pretekárov.");
             return;
         }
 
-        racerProgress = new RaceProgress[aiRacers.Length];
+        aiControllers = new AIPathFollower[racers.Length];
+        playerControllers =
+            new PlayerRaceController[racers.Length];
 
-        for (int i = 0; i < aiRacers.Length; i++)
+        for (int i = 0; i < racers.Length; i++)
         {
-            if (aiRacers[i] == null)
+            RaceProgress racer = racers[i];
+
+            if (racer == null)
             {
-                Debug.LogError(
-                    $"RaceManager: Chýba pretekár na indexe {i}.",
-                    this
+                DisableWithError(
+                    $"Chýba pretekár na indexe {i}."
                 );
 
-                enabled = false;
                 return;
             }
 
-            racerProgress[i] =
-                aiRacers[i].GetComponent<RaceProgress>();
-
-            if (racerProgress[i] == null)
+            for (int j = 0; j < i; j++)
             {
-                Debug.LogError(
-                    $"{aiRacers[i].name}: Chýba RaceProgress.",
-                    aiRacers[i]
-                );
+                if (racers[j] == racer)
+                {
+                    DisableWithError(
+                        $"{racer.name} je v zozname viackrát."
+                    );
 
-                enabled = false;
-                return;
+                    return;
+                }
             }
 
-            aiRacers[i].SetRaceStarted(false);
+            aiControllers[i] =
+                racer.GetComponent<AIPathFollower>();
+
+            playerControllers[i] =
+                racer.GetComponent<PlayerRaceController>();
+
+            bool hasAI = aiControllers[i] != null;
+            bool hasPlayer = playerControllers[i] != null;
+
+            if (hasAI == hasPlayer)
+            {
+                DisableWithError(
+                    $"{racer.name} musí mať práve jeden " +
+                    "ovládač: AIPathFollower alebo " +
+                    "PlayerRaceController."
+                );
+
+                return;
+            }
         }
+
+        SetControllersStarted(false);
 
         if (countdownText != null)
         {
@@ -96,10 +113,7 @@ public class RaceManager : MonoBehaviour
         startTime = Time.time;
         raceStarted = true;
 
-        foreach (AIPathFollower racer in aiRacers)
-        {
-            racer.SetRaceStarted(true);
-        }
+        SetControllersStarted(true);
 
         ShowCountdown("GO!");
         Debug.Log("Preteky odštartovali!", this);
@@ -116,26 +130,34 @@ public class RaceManager : MonoBehaviour
 
         elapsedTime = Time.time - startTime;
 
-        bool allFinished = true;
-
-        foreach (RaceProgress progress in racerProgress)
+        foreach (RaceProgress racer in racers)
         {
-            if (!progress.Finished)
-            {
-                allFinished = false;
-                break;
-            }
+            if (!racer.Finished)
+                return;
         }
 
-        if (allFinished)
-        {
-            raceFinished = true;
+        raceFinished = true;
 
-            Debug.Log(
-                $"Všetci dokončili preteky. " +
-                $"Celkové trvanie: {elapsedTime:F2} s.",
-                this
-            );
+        Debug.Log(
+            "Všetci dokončili preteky. " +
+            $"Celkové trvanie: {elapsedTime:F2} s.",
+            this
+        );
+    }
+
+    private void SetControllersStarted(bool started)
+    {
+        for (int i = 0; i < racers.Length; i++)
+        {
+            if (aiControllers[i] != null)
+            {
+                aiControllers[i].SetRaceStarted(started);
+            }
+
+            if (playerControllers[i] != null)
+            {
+                playerControllers[i].SetRaceStarted(started);
+            }
         }
     }
 
@@ -145,5 +167,15 @@ public class RaceManager : MonoBehaviour
         {
             countdownText.text = message;
         }
+    }
+
+    private void DisableWithError(string message)
+    {
+        Debug.LogError(
+            $"RaceManager: {message}",
+            this
+        );
+
+        enabled = false;
     }
 }
