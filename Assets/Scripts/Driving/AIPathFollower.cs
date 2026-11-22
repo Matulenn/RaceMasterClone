@@ -25,11 +25,17 @@ public class AIPathFollower : MonoBehaviour
 
     [SerializeField] private Color pathColor = Color.magenta;
 
+    [Header("Finish")]
+    [SerializeField, Min(0.1f)]
+    private float finishBraking = 10f;
+
     private Rigidbody rb;
+    private RaceProgress raceProgress;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        raceProgress = GetComponent<RaceProgress>();
     }
 
     private void Start()
@@ -50,10 +56,25 @@ public class AIPathFollower : MonoBehaviour
             0,
             path.PointCount - 1
         );
+
+        if (raceProgress == null)
+        {
+            Debug.LogWarning(
+                $"{name}: Chýba RaceProgress. " +
+                "AI bude jazdiť bez zastavenia v cieli.",
+                this
+            );
+        }
     }
 
     private void FixedUpdate()
     {
+        if (raceProgress != null && raceProgress.Finished)
+        {
+            BrakeAfterFinish();
+            return;
+        }
+
         if (path == null || path.PointCount < 2)
             return;
 
@@ -62,6 +83,7 @@ public class AIPathFollower : MonoBehaviour
         Vector3 toTarget = GetHorizontalTargetDirection();
         int checkedPoints = 0;
 
+        // Preskočí dosiahnuté alebo veľmi blízke body.
         while (toTarget.magnitude <= reachDistance &&
                checkedPoints < path.PointCount)
         {
@@ -75,11 +97,7 @@ public class AIPathFollower : MonoBehaviour
         Vector3 desiredVelocity =
             toTarget.normalized * moveSpeed;
 
-#if UNITY_6000_0_OR_NEWER
-        Vector3 velocity = rb.linearVelocity;
-#else
-        Vector3 velocity = rb.velocity;
-#endif
+        Vector3 velocity = GetBodyVelocity();
 
         Vector3 horizontalVelocity =
             new Vector3(velocity.x, 0f, velocity.z);
@@ -96,6 +114,34 @@ public class AIPathFollower : MonoBehaviour
             velocityChange,
             ForceMode.VelocityChange
         );
+    }
+
+    private void BrakeAfterFinish()
+    {
+        Vector3 velocity = GetBodyVelocity();
+
+        Vector3 horizontalVelocity =
+            new Vector3(velocity.x, 0f, velocity.z);
+
+        Vector3 velocityChange = Vector3.ClampMagnitude(
+            -horizontalVelocity,
+            finishBraking * Time.fixedDeltaTime
+        );
+
+        // Brzdí iba vodorovný pohyb.
+        rb.AddForce(
+            velocityChange,
+            ForceMode.VelocityChange
+        );
+    }
+
+    private Vector3 GetBodyVelocity()
+    {
+#if UNITY_6000_0_OR_NEWER
+        return rb.linearVelocity;
+#else
+        return rb.velocity;
+#endif
     }
 
     private Vector3 GetOffsetPoint(int index)
