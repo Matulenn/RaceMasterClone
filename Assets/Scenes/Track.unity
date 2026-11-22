@@ -784,6 +784,7 @@ RectTransform:
   m_Children:
   - {fileID: 464217362}
   - {fileID: 1394623312}
+  - {fileID: 1450595326}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1123,11 +1124,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1148096629006256218, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
   m_PrefabInstance: {fileID: 927084797}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &402179523 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8131104630634985872, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
-  m_PrefabInstance: {fileID: 927084797}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &405546001 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5730250065211011838, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -1273,8 +1269,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1520,12 +1516,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ab854b5fd35a9446bddb58cd36a58d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
-  checkpointCount: 17
+  checkpointCount: 16
   totalLaps: 1
   lapTrackingStarted: 0
   nextCheckpointIndex: 0
   completedLaps: 0
-  finished: 0
+  finished: 1
 --- !u!4 &572355415 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 383911832483115263, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -3239,8 +3235,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3345,6 +3341,143 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -2011989626597374345, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
   m_PrefabInstance: {fileID: 927084797}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1450595325
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1450595326}
+  - component: {fileID: 1450595328}
+  - component: {fileID: 1450595327}
+  m_Layer: 5
+  m_Name: ResultsText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1450595326
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450595325}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 127231865}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -30, y: -30}
+  m_SizeDelta: {x: 650, y: 300}
+  m_Pivot: {x: 1, y: 1}
+--- !u!114 &1450595327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450595325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: New Text
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 28
+  m_fontSizeBase: 28
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1450595328
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450595325}
+  m_CullTransparentMesh: 1
 --- !u!4 &1456138503 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -7894599409824020951, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -3463,7 +3596,7 @@ PrefabInstance:
       objectReference: {fileID: 12857563}
     - target: {fileID: 7696876917268351772, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: moveSpeed
-      value: 11
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 7696876917268351772, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: laneOffset
@@ -3664,12 +3797,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ab854b5fd35a9446bddb58cd36a58d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
-  checkpointCount: 17
+  checkpointCount: 16
   totalLaps: 1
   lapTrackingStarted: 0
   nextCheckpointIndex: 0
   completedLaps: 0
-  finished: 0
+  finished: 1
 --- !u!4 &1573696947 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 351631508679110500, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -3787,11 +3920,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6477355650476036946, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.54912
+      value: 0.46
       objectReference: {fileID: 0}
     - target: {fileID: 6477355650476036946, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 7.27
+      value: -8.77
       objectReference: {fileID: 0}
     - target: {fileID: 6477355650476036946, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3827,7 +3960,7 @@ PrefabInstance:
       objectReference: {fileID: 12857563}
     - target: {fileID: 7696876917268351772, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: moveSpeed
-      value: 10
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 7696876917268351772, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: laneOffset
@@ -3839,7 +3972,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7696876917268351772, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: currentPointIndex
-      value: 281
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4112,7 +4245,7 @@ Transform:
   m_GameObject: {fileID: 1753892866}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -40.2, y: 2.42, z: -10.8985}
+  m_LocalPosition: {x: -38.91, y: 2.42, z: -10.8985}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4283,6 +4416,7 @@ GameObject:
   - component: {fileID: 1806830256}
   - component: {fileID: 1806830257}
   - component: {fileID: 1806830258}
+  - component: {fileID: 1806830259}
   m_Layer: 0
   m_Name: RaceManager
   m_TagString: Untagged
@@ -4344,7 +4478,6 @@ MonoBehaviour:
   - {fileID: 562490618}
   - {fileID: 1565053321}
   checkpoints:
-  - {fileID: 402179523}
   - {fileID: 2064092988}
   - {fileID: 400685482}
   - {fileID: 1232393196}
@@ -4362,6 +4495,27 @@ MonoBehaviour:
   - {fileID: 1649183820}
   - {fileID: 250235821}
   standingsText: {fileID: 1394623313}
+--- !u!114 &1806830259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806830254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d79e0a1fe923304699d34c26c8bed07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaceResults
+  raceManager: {fileID: 1806830257}
+  racers:
+  - {fileID: 1920066589}
+  - {fileID: 562490618}
+  - {fileID: 1565053321}
+  resultsText: {fileID: 1450595327}
+  resultData:
+    complete: 0
+    racers: []
 --- !u!4 &1819871311 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4805409370228304372, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -4726,7 +4880,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ab854b5fd35a9446bddb58cd36a58d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
-  checkpointCount: 12
+  checkpointCount: 16
   totalLaps: 1
   lapTrackingStarted: 0
   nextCheckpointIndex: 0
@@ -4881,7 +5035,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2040407878}
   m_Layer: 0
-  m_Name: Track1_root
+  m_Name: Track
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4975,11 +5129,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6477355650476036946, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.5
+      value: 0.46
       objectReference: {fileID: 0}
     - target: {fileID: 6477355650476036946, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.76
+      value: -8.77
       objectReference: {fileID: 0}
     - target: {fileID: 6477355650476036946, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5027,7 +5181,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7696876917268351772, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
       propertyPath: currentPointIndex
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5088,12 +5242,12 @@ SceneRoots:
   m_Roots:
   - {fileID: 1916662016}
   - {fileID: 1012536602}
-  - {fileID: 2040407878}
-  - {fileID: 1753892871}
+  - {fileID: 1806830256}
   - {fileID: 12857564}
+  - {fileID: 1753892871}
   - {fileID: 2079871973}
   - {fileID: 1521676012}
   - {fileID: 1676627684}
-  - {fileID: 1806830256}
   - {fileID: 127231865}
   - {fileID: 973821619}
+  - {fileID: 2040407878}

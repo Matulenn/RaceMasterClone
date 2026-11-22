@@ -28,6 +28,7 @@ public class RaceManager : MonoBehaviour
     public bool RaceStarted => raceStarted;
     public bool RaceFinished => raceFinished;
     public float ElapsedTime => elapsedTime;
+    public float StartTime => startTime;
 
     private void Awake()
     {
