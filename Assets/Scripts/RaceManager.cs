@@ -24,6 +24,7 @@ public class RaceManager : MonoBehaviour
 
     private AIPathFollower[] aiControllers;
     private PlayerRaceController[] playerControllers;
+    private CarController[] carControllers;
 
     private float startTime;
 
@@ -45,8 +46,8 @@ public class RaceManager : MonoBehaviour
         }
 
         aiControllers = new AIPathFollower[racers.Length];
-        playerControllers =
-            new PlayerRaceController[racers.Length];
+        playerControllers = new PlayerRaceController[racers.Length];
+        carControllers = new CarController[racers.Length];
 
         for (int i = 0; i < racers.Length; i++)
         {
@@ -54,10 +55,7 @@ public class RaceManager : MonoBehaviour
 
             if (racer == null)
             {
-                DisableWithError(
-                    $"Chýba pretekár na indexe {i}."
-                );
-
+                DisableWithError($"Chýba pretekár na indexe {i}.");
                 return;
             }
 
@@ -65,31 +63,24 @@ public class RaceManager : MonoBehaviour
             {
                 if (racers[j] == racer)
                 {
-                    DisableWithError(
-                        $"{racer.name} je v zozname viackrát."
-                    );
-
+                    DisableWithError($"{racer.name} je v zozname viackrát.");
                     return;
                 }
             }
 
-            aiControllers[i] =
-                racer.GetComponent<AIPathFollower>();
+            aiControllers[i] = racer.GetComponent<AIPathFollower>();
+            playerControllers[i] = racer.GetComponent<PlayerRaceController>();
+            carControllers[i] = racer.GetComponent<CarController>();
 
-            playerControllers[i] =
-                racer.GetComponent<PlayerRaceController>();
-
+            bool hasCarController = carControllers[i] != null;
             bool hasAI = aiControllers[i] != null;
             bool hasPlayer = playerControllers[i] != null;
 
-            if (hasAI == hasPlayer)
+            if (!hasCarController && hasAI == hasPlayer)
             {
                 DisableWithError(
-                    $"{racer.name} musí mať práve jeden " +
-                    "ovládač: AIPathFollower alebo " +
-                    "PlayerRaceController."
+                    $"{racer.name} musí mať CarController, AIPathFollower alebo PlayerRaceController."
                 );
-
                 return;
             }
         }
@@ -139,8 +130,7 @@ public class RaceManager : MonoBehaviour
         raceFinished = true;
 
         Debug.Log(
-            "Všetci dokončili preteky. " +
-            $"Celkové trvanie: {elapsedTime:F2} s.",
+            $"Všetci dokončili preteky. Celkové trvanie: {elapsedTime:F2} s.",
             this
         );
     }
@@ -149,6 +139,11 @@ public class RaceManager : MonoBehaviour
     {
         for (int i = 0; i < racers.Length; i++)
         {
+            if (carControllers[i] != null)
+            {
+                carControllers[i].SetRaceStarted(started);
+            }
+
             if (aiControllers[i] != null)
             {
                 aiControllers[i].SetRaceStarted(started);
@@ -171,11 +166,7 @@ public class RaceManager : MonoBehaviour
 
     private void DisableWithError(string message)
     {
-        Debug.LogError(
-            $"RaceManager: {message}",
-            this
-        );
-
+        Debug.LogError($"RaceManager: {message}", this);
         enabled = false;
     }
 }

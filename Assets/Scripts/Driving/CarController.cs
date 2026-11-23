@@ -2,11 +2,10 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Splines;
 using Unity.Mathematics;
-using Random=UnityEngine.Random;
+using Random = UnityEngine.Random;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
-
 
 [RequireComponent(typeof(Rigidbody))]
 public class CarController : MonoBehaviour
@@ -215,6 +214,23 @@ public class CarController : MonoBehaviour
             nextLaneChange = Time.time + Random.Range(laneChangeInterval.x, laneChangeInterval.y);
             nextMistakeCheck = Time.time + Random.Range(2f, 5f);
         }
+        else
+        {
+            ApplyGarageUpgrades();
+        }
+    }
+
+    private void ApplyGarageUpgrades()
+    {
+        PlayerDataManager data = PlayerDataManager.Instance;
+        if (data == null) return;
+
+        maxSpeed *= data.GetSpeedMultiplier();
+        acceleration *= data.GetAccelerationMultiplier();
+        brakeDeceleration *= data.GetAccelerationMultiplier();
+        steerRate *= data.GetHandlingMultiplier();
+        maxTurnRate *= data.GetHandlingMultiplier();
+        sideGrip *= data.GetHandlingMultiplier();
     }
 
     void Update()
@@ -322,7 +338,6 @@ public class CarController : MonoBehaviour
     //  Asistencia
     // =====================================================================
 
-    // Vráti otáčanie (stupne/s), ktoré natočí auto v smere cesty a vráti ho od okraja.
     private float ComputeAssist(float t, float lateralOffset)
     {
         EvaluateTrack(AdvanceT(t, assistLookAhead), out Vector3 aheadPoint, out Vector3 aheadTangent, out Vector3 _);
@@ -357,7 +372,7 @@ public class CarController : MonoBehaviour
         if (collision.contactCount == 0) return;
 
         Vector3 normal = collision.GetContact(0).normal;
-        if (Vector3.Dot(normal, transform.up) > 0.6f) return;   // kontakt so zemou
+        if (Vector3.Dot(normal, transform.up) > 0.6f) return;
 
         float impact = Mathf.Abs(Vector3.Dot(collision.relativeVelocity, normal));
         if (impact < minImpactSpeed) return;
@@ -406,7 +421,6 @@ public class CarController : MonoBehaviour
         UpdateLane(dt);
         UpdateMistakes(dt);
 
-        // AI nereaguje okamžite: rozhoduje sa v intervaloch (horší vodič = pomalšie).
         decisionTimer -= dt;
         if (decisionTimer <= 0f)
         {
@@ -420,7 +434,6 @@ public class CarController : MonoBehaviour
         float t = GetNearestT(transform.position);
         float positiveSpeed = Mathf.Max(speed, 0f);
 
-        // 1) Cieľ: bod pred autom v jeho pruhu
         float lookAhead = aiLookAheadMin + positiveSpeed * aiLookAheadPerSpeed;
         EvaluateTrack(AdvanceT(t, lookAhead), out Vector3 point, out Vector3 tangent, out Vector3 up);
         Vector3 right = Vector3.Cross(up, tangent).normalized;
@@ -430,16 +443,13 @@ public class CarController : MonoBehaviour
         float angle = Vector3.SignedAngle(transform.forward, toTarget, transform.up);
         float steer = Mathf.Clamp(angle / aiFullSteerAngle, -1f, 1f);
 
-        // 2) Vyhýbanie prekážkam a autám
         steer += ComputeAvoidance(positiveSpeed, out bool emergency);
 
-        // 3) Nedokonalosť: kľučkovanie + občasné pretočenie volantu
         float wobble = (Mathf.PerlinNoise(noiseSeed, Time.time * 0.7f) - 0.5f) * 2f;
         steer += wobble * (1f - actualSkill) * 0.35f;
         if (mistakeTimer > 0f) steer += mistakeSteer;
         steerInput = Mathf.Clamp(steer, -1f, 1f);
 
-        // 4) Brzdenie pred zákrutou (horší vodič sa pozerá menej dopredu a je optimistickejší)
         float brakeLook = (10f + positiveSpeed * 1.5f) * Mathf.Lerp(0.5f, 1f, actualSkill);
         EvaluateTrack(t, out Vector3 _, out Vector3 tangentNow, out Vector3 _);
         EvaluateTrack(AdvanceT(t, brakeLook), out Vector3 _, out Vector3 tangentLater, out Vector3 _);
@@ -451,7 +461,6 @@ public class CarController : MonoBehaviour
         brakeInput = speed > cornerSpeed + 1f || emergency;
     }
 
-    // Dodatočné zatáčanie na vyhnutie sa prekážke (-avoidStrength..avoidStrength).
     private float ComputeAvoidance(float speed, out bool emergency)
     {
         emergency = false;
@@ -461,7 +470,6 @@ public class CarController : MonoBehaviour
         float center = CastDistance(origin, transform.forward, range, out Collider hitCollider);
         if (hitCollider == null) return 0f;
 
-        // Nová prekážka: AI si ju môže nevšimnúť (podľa zručnosti).
         if (hitCollider != lastSeenObstacle)
         {
             lastSeenObstacle = hitCollider;
@@ -473,7 +481,6 @@ public class CarController : MonoBehaviour
         }
         if (hitCollider == ignoredObstacle && ignoreTimer > 0f) return 0f;
 
-        // Kam uhnúť: na stranu, kde je viac miesta, ale nie mimo cesty.
         Vector3 leftDir = Quaternion.AngleAxis(-25f, transform.up) * transform.forward;
         Vector3 rightDir = Quaternion.AngleAxis(25f, transform.up) * transform.forward;
         float leftFree = CastDistance(origin, leftDir, range, out _);
@@ -488,7 +495,6 @@ public class CarController : MonoBehaviour
         float urgency = 1f - center / range;
         emergency = urgency > 0.75f && Mathf.Max(leftFree, rightFree) < range * 0.5f;
 
-        // Posunie aj svoj pruh, aby sa po obídení nevracal späť do prekážky.
         float maxLane = roadHalfWidth * laneRange;
         targetLaneOffset = Mathf.Clamp(currentOffset + side * 2.5f, -maxLane, maxLane);
 
@@ -505,9 +511,9 @@ public class CarController : MonoBehaviour
 
         foreach (RaycastHit hit in hits)
         {
-            if (hit.collider.transform.IsChildOf(transform)) continue;   // vlastné auto
-            if (Vector3.Dot(hit.normal, transform.up) > 0.6f) continue;  // zem / cesta
-            if (hit.distance <= 0f) continue;                            // prekrytie na štarte
+            if (hit.collider.transform.IsChildOf(transform)) continue;
+            if (Vector3.Dot(hit.normal, transform.up) > 0.6f) continue;
+            if (hit.distance <= 0f) continue;
             if (hit.distance < closest)
             {
                 closest = hit.distance;
@@ -561,7 +567,11 @@ public class CarController : MonoBehaviour
     //  Verejné funkcie
     // =====================================================================
 
-    // Vráti auto na najbližšie miesto na ceste.
+    public void SetRaceStarted(bool started)
+    {
+        isDriving = started;
+    }
+
     public void ResetToTrack()
     {
         float t = GetNearestT(rb.position);
@@ -610,20 +620,12 @@ public class CarController : MonoBehaviour
         return trackClosed ? Mathf.Repeat(result, 1f) : Mathf.Min(result, 1f);
     }
 
-    // Kolízny materiál bez trenia: karoséria sa nebrzdí o cestu ani nezasekáva o steny.
     private void ApplyFrictionlessMaterial()
     {
-#if UNITY_6000_0_OR_NEWER
         var material = new PhysicsMaterial("CarNoFriction")
         {
             frictionCombine = PhysicsMaterialCombine.Minimum,
             bounceCombine = PhysicsMaterialCombine.Minimum,
-#else
-        var material = new PhysicMaterial("CarNoFriction")
-        {
-            frictionCombine = PhysicMaterialCombine.Minimum,
-            bounceCombine = PhysicMaterialCombine.Minimum,
-#endif
             dynamicFriction = 0f,
             staticFriction = 0f,
             bounciness = 0f
@@ -653,9 +655,6 @@ public class CarController : MonoBehaviour
 #endif
     }
 
-    // V Scene okne počas hry (keď je auto vybrané):
-    // zelená = najbližší bod cesty, žltá = smer asistencie,
-    // modrá = cieľ AI v pruhu, červené čiary = „zrak“ AI.
     void OnDrawGizmosSelected()
     {
         if (!Application.isPlaying) return;
