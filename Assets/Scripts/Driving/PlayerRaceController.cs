@@ -28,6 +28,11 @@ public class PlayerRaceController : MonoBehaviour
     private Rigidbody rb;
     private RaceProgress raceProgress;
 
+    private float baseMoveSpeed;
+    private float baseAcceleration;
+    private float baseBraking;
+    private float baseTurnSpeed;
+
     private bool raceStarted;
     private float throttleInput;
     private float steeringInput;
@@ -43,7 +48,36 @@ public class PlayerRaceController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         raceProgress = GetComponent<RaceProgress>();
 
+        baseMoveSpeed = moveSpeed;
+        baseAcceleration = acceleration;
+        baseBraking = braking;
+        baseTurnSpeed = turnSpeed;
+
         headingYaw = startingYaw;
+    }
+
+    private void Start()
+    {
+        ApplyGarageUpgrades();
+    }
+
+    public void ApplyGarageUpgrades()
+    {
+        PlayerDataManager data = PlayerDataManager.Instance;
+        if (data == null) return;
+
+        moveSpeed = baseMoveSpeed * data.GetSpeedMultiplier();
+        acceleration = baseAcceleration * data.GetAccelerationMultiplier();
+        braking = baseBraking * data.GetAccelerationMultiplier();
+        turnSpeed = baseTurnSpeed * data.GetHandlingMultiplier();
+
+        Debug.Log(
+            $"[Garage -> Track] Aplikované vylepšenia: " +
+            $"Speed Lvl {data.TopSpeedLevel} ({moveSpeed:F1}), " +
+            $"Accel Lvl {data.AccelerationLevel} ({acceleration:F1}), " +
+            $"Handling Lvl {data.HandlingLevel} ({turnSpeed:F1})",
+            this
+        );
     }
 
     private void Update()
@@ -118,14 +152,11 @@ public class PlayerRaceController : MonoBehaviour
             return;
         }
 
-        // Jednoduché testovacie riadenie:
-        // smer možno meniť aj počas státia.
         headingYaw +=
             steeringInput * turnSpeed * Time.fixedDeltaTime;
 
         Vector3 forward =
-            Quaternion.Euler(0f, headingYaw, 0f)
-            * Vector3.forward;
+            Quaternion.Euler(0f, headingYaw, 0f) * Vector3.forward;
 
         Vector3 desiredVelocity =
             forward * throttleInput * moveSpeed;
