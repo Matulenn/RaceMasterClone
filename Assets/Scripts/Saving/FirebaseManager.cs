@@ -16,8 +16,10 @@ public class PlayerCloudData
 [Serializable]
 public class RaceResultCloudData
 {
+    public string levelName;
     public int place;
     public int totalRacers;
+    public int score;
     public float timeSeconds;
     public int coinsEarned;
     public string timestamp;
@@ -27,6 +29,7 @@ public class FirebaseManager : MonoBehaviour
 {
     private static FirebaseManager instance;
     private static bool isQuitting;
+
     public static FirebaseManager Instance
     {
         get
@@ -40,6 +43,7 @@ public class FirebaseManager : MonoBehaviour
             return instance;
         }
     }
+
     private void OnApplicationQuit()
     {
         isQuitting = true;
@@ -128,12 +132,15 @@ public class FirebaseManager : MonoBehaviour
             if (snapshot.Exists && !string.IsNullOrEmpty(snapshot.GetRawJsonValue()))
             {
                 PlayerCloudData cloudData = JsonUtility.FromJson<PlayerCloudData>(snapshot.GetRawJsonValue());
-                PlayerDataManager.Instance.ApplyCloudData(
-                    cloudData.coins,
-                    cloudData.topSpeedLevel,
-                    cloudData.accelerationLevel,
-                    cloudData.handlingLevel
-                );
+                if (PlayerDataManager.Instance != null)
+                {
+                    PlayerDataManager.Instance.ApplyCloudData(
+                        cloudData.coins,
+                        cloudData.topSpeedLevel,
+                        cloudData.accelerationLevel,
+                        cloudData.handlingLevel
+                    );
+                }
                 SetStatus("Cloud progress loaded.", false);
             }
             else
@@ -153,9 +160,11 @@ public class FirebaseManager : MonoBehaviour
             return;
         }
 
+        var data = PlayerDataManager.Instance;
+        if (data == null) return;
+
         SetStatus("Saving progress to Firebase...", false);
 
-        var data = PlayerDataManager.Instance;
         PlayerCloudData cloudData = new PlayerCloudData
         {
             coins = data.Coins,
@@ -180,10 +189,13 @@ public class FirebaseManager : MonoBehaviour
         });
     }
 
-    // Uloží výsledok pretekov a pripočíta získané mince
-    public void SaveRaceResult(int finalPlace, int totalRacers, float raceTimeSeconds, int coinsEarned)
+    // Uloží výsledok pretekov (vrátane levelu a skóre) a pripočíta získané mince
+    public void SaveRaceResult(int finalPlace, int totalRacers, float raceTimeSeconds, int coinsEarned, string levelName = "Level 1")
     {
-        PlayerDataManager.Instance.AddCoins(coinsEarned);
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.AddCoins(coinsEarned);
+        }
 
         if (!isInitialized)
         {
@@ -193,13 +205,17 @@ public class FirebaseManager : MonoBehaviour
 
         SetStatus("Saving race result...", false);
 
+        int calculatedScore = Mathf.Max(100, (totalRacers - finalPlace + 1) * 500 - Mathf.RoundToInt(raceTimeSeconds * 5f));
+
         RaceResultCloudData resultData = new RaceResultCloudData
         {
+            levelName = levelName,
             place = finalPlace,
             totalRacers = totalRacers,
-            timeSeconds = raceTimeSeconds,
+            score = calculatedScore,
+            timeSeconds = Mathf.Round(raceTimeSeconds * 100f) / 100f,
             coinsEarned = coinsEarned,
-            timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
+            timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
 
         string json = JsonUtility.ToJson(resultData);
@@ -212,7 +228,6 @@ public class FirebaseManager : MonoBehaviour
             }
             else
             {
-                // Zároveň uložíme aktualizovaný počet mincí používateľa
                 SavePlayerProgress();
             }
         });
