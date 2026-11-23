@@ -1484,6 +1484,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: moveSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4752278437764888774, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_Name
       value: MovingObstacle (5)
@@ -1996,6 +2000,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 511656412662223387, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: moveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: startOnLeft
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4752278437764888774, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
@@ -2842,6 +2854,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: startOnLeft
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4752278437764888774, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_Name
       value: MovingObstacle (2)
@@ -3579,6 +3595,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: moveSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4752278437764888774, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_Name
       value: MovingObstacle (8)
@@ -3639,6 +3659,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 511656412662223387, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: moveSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: startOnLeft
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4752278437764888774, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
@@ -4600,6 +4628,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: moveSpeed
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4752278437764888774, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_Name
       value: MovingObstacle (1)
@@ -4907,6 +4939,10 @@ PrefabInstance:
     - target: {fileID: 511656412662223387, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2733203996364042593, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
+      propertyPath: moveSpeed
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4752278437764888774, guid: d56b95408fac87f4d97fb28bb85b54cd, type: 3}
       propertyPath: m_Name
