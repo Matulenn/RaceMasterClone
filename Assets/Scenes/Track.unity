@@ -1355,12 +1355,52 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: skill
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: track
       value: 
       objectReference: {fileID: 137785354}
     - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: maxSpeed
+      value: 33.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: steerRate
+      value: 95
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: detectRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: maxTurnRate
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: acceleration
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: roadHalfWidth
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: detectPerSpeed
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: sharpCornerSpeed
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: aiSpeedMultiplierRange.x
+      value: 0.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: aiSpeedMultiplierRange.y
+      value: 1.08
       objectReference: {fileID: 0}
     - target: {fileID: 6177356689943182555, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2459,6 +2499,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9181840810997101257, guid: 4607b0f5052b3a64e9e66f7d76b2de93, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3425,12 +3469,52 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: skill
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: track
       value: 
       objectReference: {fileID: 137785354}
     - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: maxSpeed
+      value: 33.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: steerRate
+      value: 95
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: detectRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: maxTurnRate
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: acceleration
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: roadHalfWidth
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: detectPerSpeed
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: sharpCornerSpeed
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: aiSpeedMultiplierRange.x
+      value: 0.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: aiSpeedMultiplierRange.y
+      value: 1.08
       objectReference: {fileID: 0}
     - target: {fileID: 6177356689943182555, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6156,12 +6240,52 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: skill
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: track
       value: 
       objectReference: {fileID: 137785354}
     - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: maxSpeed
+      value: 33.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: steerRate
+      value: 95
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: detectRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: maxTurnRate
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: acceleration
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: roadHalfWidth
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: detectPerSpeed
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: sharpCornerSpeed
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: aiSpeedMultiplierRange.x
+      value: 0.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 4908883237912716279, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      propertyPath: aiSpeedMultiplierRange.y
+      value: 1.08
       objectReference: {fileID: 0}
     - target: {fileID: 6177356689943182555, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: m_LocalPosition.x
