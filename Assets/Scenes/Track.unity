@@ -1404,14 +1404,59 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: m_Name
-      value: AI
+      value: AI2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6036786868032273353, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 424348498}
   m_SourcePrefab: {fileID: 100100000, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+--- !u!1 &424348497 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+  m_PrefabInstance: {fileID: 424348496}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &424348498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 424348497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab854b5fd35a9446bddb58cd36a58d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
+  checkpointCount: 16
+  totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
+  lapTrackingStarted: 0
+  nextCheckpointIndex: 0
+  completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
+  finished: 0
 --- !u!4 &432192987 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -314742944870112948, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -1895,8 +1940,16 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 6036786868032273353, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 626958892}
   m_SourcePrefab: {fileID: 100100000, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+--- !u!1 &554160647 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+  m_PrefabInstance: {fileID: 554160646}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &562490611 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2213061481126085680, guid: b60cf1269e37080428c5ceb6529faf46, type: 3}
@@ -2212,6 +2265,43 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6177356689943182555, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
   m_PrefabInstance: {fileID: 554160646}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &626958892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554160647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab854b5fd35a9446bddb58cd36a58d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
+  checkpointCount: 16
+  totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
+  lapTrackingStarted: 0
+  nextCheckpointIndex: 0
+  completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
+  finished: 0
 --- !u!4 &628736261 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8004194261325645659, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -3376,14 +3466,59 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: m_Name
-      value: AI
+      value: AI1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6036786868032273353, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 967624839}
   m_SourcePrefab: {fileID: 100100000, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+--- !u!1 &967624838 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+  m_PrefabInstance: {fileID: 967624837}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &967624839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967624838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab854b5fd35a9446bddb58cd36a58d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
+  checkpointCount: 16
+  totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
+  lapTrackingStarted: 0
+  nextCheckpointIndex: 0
+  completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
+  finished: 0
 --- !u!1 &968644480 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6355542860893814241, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -5880,10 +6015,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaceManager
   racers:
-  - {fileID: 1265413536}
-  - {fileID: 1920066589}
-  - {fileID: 562490618}
-  - {fileID: 1565053321}
+  - {fileID: 626958892}
+  - {fileID: 967624839}
+  - {fileID: 424348498}
+  - {fileID: 1814607379}
   countdownText: {fileID: 666015980}
   countdownFrom: 3
   goDisplayDuration: 1
@@ -5903,10 +6038,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaceStandings
   racers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 626958892}
+  - {fileID: 967624839}
+  - {fileID: 424348498}
+  - {fileID: 1814607379}
   checkpoints:
   - {fileID: 2064092988}
   - {fileID: 400685482}
@@ -5939,10 +6074,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaceResults
   raceManager: {fileID: 1806830257}
   racers:
-  - {fileID: 1265413536}
-  - {fileID: 1920066589}
-  - {fileID: 562490618}
-  - {fileID: 1565053321}
+  - {fileID: 626958892}
+  - {fileID: 967624839}
+  - {fileID: 424348498}
+  - {fileID: 1814607379}
   resultsText: {fileID: 666015979}
   resultData:
     complete: 0
@@ -5954,7 +6089,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806830254}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd552c530fda34e4db412902e51a6d58, type: 3}
   m_Name: 
@@ -5962,9 +6097,9 @@ MonoBehaviour:
   raceManager: {fileID: 1806830257}
   path: {fileID: 12857563}
   aiRacers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 967624839}
+  - {fileID: 424348498}
+  - {fileID: 1814607379}
   assistanceStartGap: 5
   fullAssistanceGap: 20
   maximumBoost: 1
@@ -6030,14 +6165,59 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
       propertyPath: m_Name
-      value: AI
+      value: AI3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6036786868032273353, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1814607379}
   m_SourcePrefab: {fileID: 100100000, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+--- !u!1 &1814607378 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7071778936889453731, guid: 4162e0a53a0a0204880dfe442c068478, type: 3}
+  m_PrefabInstance: {fileID: 1814607377}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1814607379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1814607378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab854b5fd35a9446bddb58cd36a58d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
+  checkpointCount: 16
+  totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
+  lapTrackingStarted: 0
+  nextCheckpointIndex: 0
+  completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
+  finished: 0
 --- !u!4 &1819871311 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4805409370228304372, guid: 28a13a92c2391034e8026e2cd4b98c01, type: 3}
@@ -6890,3 +7070,5 @@ SceneRoots:
   - {fileID: 424348496}
   - {fileID: 1814607377}
   - {fileID: 137785355}
+  - {fileID: 666015978}
+  - {fileID: 889135279}

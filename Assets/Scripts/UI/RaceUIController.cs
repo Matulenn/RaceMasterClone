@@ -66,6 +66,7 @@ public class RaceUIController : MonoBehaviour
     private RaceResults raceResults;
     private RaceStandings raceStandings;
     private TMP_Text externalStandingsText;
+    private CarController playerCarController;
     private PlayerRaceController playerController;
     private RaceProgress playerProgress;
     private Rigidbody playerRigidbody;
@@ -84,10 +85,11 @@ public class RaceUIController : MonoBehaviour
     {
         Time.timeScale = 1f;
         AudioListener.volume = PlayerPrefs.GetFloat("GameVolume", 1f);
+
         if (raceMusicToStop != null)
-{
-    raceMusicToStop.volume *= PlayerPrefs.GetFloat("MusicVolume", 1f);
-}
+        {
+            raceMusicToStop.volume *= PlayerPrefs.GetFloat("MusicVolume", 1f);
+        }
 
         if (hudPanel != null) hudPanel.SetActive(true);
         if (pausePanel != null) pausePanel.SetActive(false);
@@ -105,7 +107,7 @@ public class RaceUIController : MonoBehaviour
 
         ConnectToRaceSystems();
 
-        if (raceManager != null)
+        if (raceManager != null && raceManager.enabled)
         {
             isRaceStarted = raceManager.RaceStarted;
             if (countdownText != null)
@@ -148,11 +150,32 @@ public class RaceUIController : MonoBehaviour
             }
         }
 
-        playerController = FindFirstObjectByType<PlayerRaceController>();
-        if (playerController != null)
+        GameObject playerObj = null;
+
+        CarController[] allCars = FindObjectsByType<CarController>(FindObjectsSortMode.None);
+        for (int i = 0; i < allCars.Length; i++)
         {
-            playerRigidbody = playerController.GetComponent<Rigidbody>();
-            playerProgress = playerController.GetComponent<RaceProgress>();
+            if (!allCars[i].IsAI)
+            {
+                playerCarController = allCars[i];
+                playerObj = allCars[i].gameObject;
+                break;
+            }
+        }
+
+        if (playerObj == null)
+        {
+            playerController = FindFirstObjectByType<PlayerRaceController>();
+            if (playerController != null)
+            {
+                playerObj = playerController.gameObject;
+            }
+        }
+
+        if (playerObj != null)
+        {
+            playerRigidbody = playerObj.GetComponent<Rigidbody>();
+            playerProgress = playerObj.GetComponent<RaceProgress>();
             if (playerProgress != null)
             {
                 playerProgress.FinishedRace += OnPlayerFinishedRace;
@@ -170,14 +193,14 @@ public class RaceUIController : MonoBehaviour
 
     private void Update()
     {
-        if (raceManager != null && isRaceActive)
+        if (raceManager != null && raceManager.enabled && isRaceActive)
         {
             SyncWithRaceManager();
         }
 
         if (CanRace)
         {
-            if (raceManager != null)
+            if (raceManager != null && raceManager.enabled)
             {
                 raceTime = raceManager.ElapsedTime;
             }
@@ -204,6 +227,49 @@ public class RaceUIController : MonoBehaviour
             {
                 TogglePause();
             }
+        }
+    }
+
+    private void LateUpdate()
+    {
+        HighlightPlayerRow(positionText, false);
+
+        if (resultsPanel != null && resultsPanel.activeSelf)
+        {
+            HighlightPlayerRow(finalPositionText, true);
+        }
+    }
+
+    private void HighlightPlayerRow(TMP_Text targetText, bool replaceHeader)
+    {
+        if (targetText == null || string.IsNullOrEmpty(targetText.text)) return;
+
+        string content = targetText.text;
+
+        if (replaceHeader)
+        {
+            content = content.Replace("PRIEBEZNE DOJAZDY", "PORADIE V CIELI")
+                             .Replace("VYSLEDKY", "PORADIE V CIELI");
+        }
+
+        string playerName = playerProgress != null ? playerProgress.name : "Player";
+
+        if (!content.Contains("<color=#FFD54F>"))
+        {
+            string[] lines = content.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].Contains(playerName))
+                {
+                    lines[i] = $"<color=#FFD54F><b>{lines[i]}</b></color>";
+                }
+            }
+            content = string.Join("\n", lines);
+        }
+
+        if (targetText.text != content)
+        {
+            targetText.text = content;
         }
     }
 
@@ -247,13 +313,18 @@ public class RaceUIController : MonoBehaviour
 
     private void UpdatePlayerTelemetry()
     {
-        if (playerRigidbody != null)
+        if (playerCarController != null)
+        {
+            float speedKmh = Mathf.Max(0f, playerCarController.CurrentSpeed) * 3.6f;
+            UpdateSpeed(speedKmh);
+        }
+        else if (playerRigidbody != null)
         {
             float speedKmh = playerRigidbody.linearVelocity.magnitude * 3.6f;
             UpdateSpeed(speedKmh);
         }
 
-        if (externalStandingsText != null && playerProgress != null)
+        if (externalStandingsText != null && externalStandingsText != positionText && playerProgress != null)
         {
             string rawStandings = externalStandingsText.text;
             if (!string.IsNullOrEmpty(rawStandings))
@@ -280,7 +351,7 @@ public class RaceUIController : MonoBehaviour
         if (!isRaceActive) return;
 
         int finalPlace = 1;
-        float finalFinishTime = raceManager != null ? raceManager.ElapsedTime : raceTime;
+        float finalFinishTime = (raceManager != null && raceManager.enabled) ? raceManager.ElapsedTime : raceTime;
 
         if (raceResults != null)
         {
@@ -559,7 +630,6 @@ public class RaceUIController : MonoBehaviour
             }
         }
 
-
         string formattedTime = FormatTime(raceTime);
         if (finalTimeText != null)
             finalTimeText.text = $"Time: {formattedTime}";
@@ -678,45 +748,4 @@ public class RaceUIController : MonoBehaviour
             cloudStatusText.color = new Color(0.35f, 1f, 0.5f, 1f);
         }
     }
-
-    private void LateUpdate()
-{
-    HighlightPlayerRow(positionText, false);
-
-    if (resultsPanel != null && resultsPanel.activeSelf)
-    {
-        HighlightPlayerRow(finalPositionText, true);
-    }
-}
-
-private void HighlightPlayerRow(TMP_Text targetText, bool replaceHeader)
-{
-    if (targetText == null || string.IsNullOrEmpty(targetText.text)) return;
-
-    string content = targetText.text;
-
-    if (replaceHeader)
-    {
-        content = content.Replace("PRIEBEZNE DOJAZDY", "PORADIE V CIELI")
-                         .Replace("VYSLEDKY", "PORADIE V CIELI");
-    }
-
-    if (!content.Contains("<color=#FFD54F>"))
-    {
-        string[] lines = content.Split('\n');
-        for (int i = 0; i < lines.Length; i++)
-        {
-            if (lines[i].Contains("Player"))
-            {
-                lines[i] = $"<color=#FFD54F><b>{lines[i]}</b></color>";
-            }
-        }
-        content = string.Join("\n", lines);
-    }
-
-    if (targetText.text != content)
-    {
-        targetText.text = content;
-    }
-}
 }
