@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "243212795267",
+    "firebase_url": "https://racemasterclone-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "racemasterclone",
+    "storage_bucket": "racemasterclone.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243212795267:android:5b0654a2fc4503ba5fcab6",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.RaceMasterClone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvsvaAJRqVhgGJXi0e5IKm4lyl3Rzpxdo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
