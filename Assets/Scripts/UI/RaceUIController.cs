@@ -37,6 +37,12 @@ public class RaceUIController : MonoBehaviour
     [SerializeField] private TMP_Text earnedCoinsText;
     [SerializeField] private TMP_Text cloudStatusText;
 
+    [Header("Odmeny za umiestnenie (Mince)")]
+    [SerializeField] private int firstPlaceCoins = 150;
+    [SerializeField] private int secondPlaceCoins = 100;
+    [SerializeField] private int thirdPlaceCoins = 60;
+    [SerializeField] private int participationCoins = 30;
+
     [Header("Štartovacie odpočítavanie")]
     [SerializeField] private bool playCountdownOnStart = true;
 
@@ -56,6 +62,17 @@ public class RaceUIController : MonoBehaviour
     private bool isRaceActive = true;
     private bool isPaused;
 
+    private RaceManager raceManager;
+    private RaceResults raceResults;
+    private RaceStandings raceStandings;
+    private TMP_Text externalStandingsText;
+    private PlayerRaceController playerController;
+    private RaceProgress playerProgress;
+    private Rigidbody playerRigidbody;
+    private int totalRacersCount = 4;
+    private string lastSyncedCountdown = "";
+    private Coroutine countdownAnimCoroutine;
+
     public bool CanRace => isRaceStarted && isRaceActive && !isPaused;
 
 #if UNITY_EDITOR
@@ -66,6 +83,11 @@ public class RaceUIController : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 1f;
+        AudioListener.volume = PlayerPrefs.GetFloat("GameVolume", 1f);
+        if (raceMusicToStop != null)
+{
+    raceMusicToStop.volume *= PlayerPrefs.GetFloat("MusicVolume", 1f);
+}
 
         if (hudPanel != null) hudPanel.SetActive(true);
         if (pausePanel != null) pausePanel.SetActive(false);
@@ -81,7 +103,17 @@ public class RaceUIController : MonoBehaviour
         ApplySpeedVisuals(0f);
         UpdateTimerUI(0f);
 
-        if (playCountdownOnStart && countdownText != null)
+        ConnectToRaceSystems();
+
+        if (raceManager != null)
+        {
+            isRaceStarted = raceManager.RaceStarted;
+            if (countdownText != null)
+            {
+                countdownText.gameObject.SetActive(!isRaceStarted);
+            }
+        }
+        else if (playCountdownOnStart && countdownText != null)
         {
             StartCoroutine(CountdownRoutine());
         }
@@ -92,12 +124,70 @@ public class RaceUIController : MonoBehaviour
         }
     }
 
+    private void ConnectToRaceSystems()
+    {
+        raceManager = FindFirstObjectByType<RaceManager>();
+        raceResults = FindFirstObjectByType<RaceResults>();
+        raceStandings = FindFirstObjectByType<RaceStandings>();
+
+        if (raceStandings != null)
+        {
+            FieldInfo standingsField = typeof(RaceStandings).GetField("standingsText", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (standingsField != null)
+            {
+                externalStandingsText = standingsField.GetValue(raceStandings) as TMP_Text;
+            }
+        }
+
+        if (raceResults != null)
+        {
+            RaceResultData snapshot = raceResults.GetResultsSnapshot();
+            if (snapshot != null && snapshot.racers != null && snapshot.racers.Count > 0)
+            {
+                totalRacersCount = snapshot.racers.Count;
+            }
+        }
+
+        playerController = FindFirstObjectByType<PlayerRaceController>();
+        if (playerController != null)
+        {
+            playerRigidbody = playerController.GetComponent<Rigidbody>();
+            playerProgress = playerController.GetComponent<RaceProgress>();
+            if (playerProgress != null)
+            {
+                playerProgress.FinishedRace += OnPlayerFinishedRace;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (playerProgress != null)
+        {
+            playerProgress.FinishedRace -= OnPlayerFinishedRace;
+        }
+    }
+
     private void Update()
     {
+        if (raceManager != null && isRaceActive)
+        {
+            SyncWithRaceManager();
+        }
+
         if (CanRace)
         {
-            raceTime += Time.deltaTime;
+            if (raceManager != null)
+            {
+                raceTime = raceManager.ElapsedTime;
+            }
+            else
+            {
+                raceTime += Time.deltaTime;
+            }
+
             UpdateTimerUI(raceTime);
+            UpdatePlayerTelemetry();
 
 #if UNITY_EDITOR
             HandleEditorPreviewControls();
@@ -114,6 +204,117 @@ public class RaceUIController : MonoBehaviour
             {
                 TogglePause();
             }
+        }
+    }
+
+    private void SyncWithRaceManager()
+    {
+        isRaceStarted = raceManager.RaceStarted;
+
+        if (countdownText == null) return;
+
+        string currentLabel = countdownText.text;
+        if (currentLabel == lastSyncedCountdown) return;
+
+        lastSyncedCountdown = currentLabel;
+
+        if (string.IsNullOrEmpty(currentLabel))
+        {
+            countdownText.transform.localScale = Vector3.one;
+            countdownText.gameObject.SetActive(false);
+            return;
+        }
+
+        countdownText.gameObject.SetActive(true);
+        bool isGo = currentLabel.Equals("GO!", StringComparison.OrdinalIgnoreCase);
+
+        Color stepColor = new Color(0.2f, 1f, 0.45f, 1f);
+        if (!isGo)
+        {
+            if (currentLabel == "3") stepColor = new Color(0.95f, 0.25f, 0.25f, 1f);
+            else if (currentLabel == "2") stepColor = new Color(1f, 0.78f, 0.1f, 1f);
+            else stepColor = new Color(0.25f, 0.88f, 0.4f, 1f);
+        }
+
+        PlayCountdownSound(isGo);
+
+        if (countdownAnimCoroutine != null)
+        {
+            StopCoroutine(countdownAnimCoroutine);
+        }
+        countdownAnimCoroutine = StartCoroutine(AnimateCountdownStep(currentLabel, stepColor, isGo ? 0.65f : 0.8f));
+    }
+
+    private void UpdatePlayerTelemetry()
+    {
+        if (playerRigidbody != null)
+        {
+            float speedKmh = playerRigidbody.linearVelocity.magnitude * 3.6f;
+            UpdateSpeed(speedKmh);
+        }
+
+        if (externalStandingsText != null && playerProgress != null)
+        {
+            string rawStandings = externalStandingsText.text;
+            if (!string.IsNullOrEmpty(rawStandings))
+            {
+                string[] lines = rawStandings.Split('\n');
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (lines[i].Contains(playerProgress.name))
+                    {
+                        int dotIndex = lines[i].IndexOf('.');
+                        if (dotIndex > 0 && int.TryParse(lines[i].Substring(0, dotIndex).Trim(), out int place))
+                        {
+                            UpdatePosition(place, totalRacersCount);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void OnPlayerFinishedRace(RaceProgress racer)
+    {
+        if (!isRaceActive) return;
+
+        int finalPlace = 1;
+        float finalFinishTime = raceManager != null ? raceManager.ElapsedTime : raceTime;
+
+        if (raceResults != null)
+        {
+            RaceResultData snapshot = raceResults.GetResultsSnapshot();
+            if (snapshot != null && snapshot.racers != null)
+            {
+                totalRacersCount = snapshot.racers.Count;
+                for (int i = 0; i < snapshot.racers.Count; i++)
+                {
+                    if (snapshot.racers[i].racerName == racer.name && snapshot.racers[i].finished)
+                    {
+                        finalPlace = snapshot.racers[i].finishPosition;
+                        finalFinishTime = snapshot.racers[i].finishTimeSeconds;
+                        break;
+                    }
+                }
+            }
+        }
+
+        raceTime = finalFinishTime;
+        UpdateTimerUI(raceTime);
+
+        int rewardCoins = GetCoinsForPlace(finalPlace);
+        ShowResults(finalPlace, totalRacersCount, rewardCoins);
+    }
+
+    private int GetCoinsForPlace(int place)
+    {
+        switch (place)
+        {
+            case 1: return firstPlaceCoins;
+            case 2: return secondPlaceCoins;
+            case 3: return thirdPlaceCoins;
+            default: return participationCoins;
         }
     }
 
@@ -207,7 +408,7 @@ public class RaceUIController : MonoBehaviour
 
         if (Keyboard.current.f8Key.wasPressedThisFrame)
         {
-            ShowResults(1, 4, 150);
+            ShowResults(1, totalRacersCount, firstPlaceCoins);
             return;
         }
 
@@ -228,7 +429,6 @@ public class RaceUIController : MonoBehaviour
     }
 #endif
 
-    // Verejná metóda pre skript auta
     public void UpdateSpeed(float speedKmh)
     {
 #if UNITY_EDITOR
@@ -262,7 +462,6 @@ public class RaceUIController : MonoBehaviour
         }
     }
 
-    // Verejná metóda pre skript poradia na trati
     public void UpdatePosition(int currentPlace, int totalRacers)
     {
         if (positionText != null) positionText.text = $"{currentPlace} / {totalRacers}";
@@ -281,8 +480,6 @@ public class RaceUIController : MonoBehaviour
         int hundredths = Mathf.FloorToInt((timeInSeconds * 100f) % 100f);
         return $"{minutes:00}:{seconds:00}.{hundredths:00}";
     }
-
-    // --- PAUZA A NASTAVENIA ---
 
     public void TogglePause()
     {
@@ -329,8 +526,6 @@ public class RaceUIController : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
-    // --- CIEĽOVÁ OBRAZOVKA ---
-
     public void ShowResults(int finalPlace, int totalRacers, int coinsEarned)
     {
         isRaceActive = false;
@@ -364,10 +559,8 @@ public class RaceUIController : MonoBehaviour
             }
         }
 
-        if (finalPositionText != null)
-            finalPositionText.text = $"Position: {finalPlace} / {totalRacers}";
 
-        string formattedTime = timerText != null ? timerText.text : FormatTime(raceTime);
+        string formattedTime = FormatTime(raceTime);
         if (finalTimeText != null)
             finalTimeText.text = $"Time: {formattedTime}";
 
@@ -485,4 +678,45 @@ public class RaceUIController : MonoBehaviour
             cloudStatusText.color = new Color(0.35f, 1f, 0.5f, 1f);
         }
     }
+
+    private void LateUpdate()
+{
+    HighlightPlayerRow(positionText, false);
+
+    if (resultsPanel != null && resultsPanel.activeSelf)
+    {
+        HighlightPlayerRow(finalPositionText, true);
+    }
+}
+
+private void HighlightPlayerRow(TMP_Text targetText, bool replaceHeader)
+{
+    if (targetText == null || string.IsNullOrEmpty(targetText.text)) return;
+
+    string content = targetText.text;
+
+    if (replaceHeader)
+    {
+        content = content.Replace("PRIEBEZNE DOJAZDY", "PORADIE V CIELI")
+                         .Replace("VYSLEDKY", "PORADIE V CIELI");
+    }
+
+    if (!content.Contains("<color=#FFD54F>"))
+    {
+        string[] lines = content.Split('\n');
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (lines[i].Contains("Player"))
+            {
+                lines[i] = $"<color=#FFD54F><b>{lines[i]}</b></color>";
+            }
+        }
+        content = string.Join("\n", lines);
+    }
+
+    if (targetText.text != content)
+    {
+        targetText.text = content;
+    }
+}
 }
