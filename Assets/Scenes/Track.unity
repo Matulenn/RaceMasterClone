@@ -1564,9 +1564,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
   checkpointCount: 16
   totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
   lapTrackingStarted: 0
   nextCheckpointIndex: 0
   completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
   finished: 1
 --- !u!114 &562490619
 MonoBehaviour:
@@ -3344,9 +3363,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
   checkpointCount: 16
   totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
   lapTrackingStarted: 0
   nextCheckpointIndex: 0
   completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
   finished: 1
 --- !u!54 &1265413537
 Rigidbody:
@@ -4385,9 +4423,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
   checkpointCount: 16
   totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
   lapTrackingStarted: 0
   nextCheckpointIndex: 0
   completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
   finished: 1
 --- !u!114 &1565053322
 MonoBehaviour:
@@ -5527,9 +5584,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaceProgress
   checkpointCount: 16
   totalLaps: 1
+  checkpoints:
+  - {fileID: 2064092988}
+  - {fileID: 400685482}
+  - {fileID: 1232393196}
+  - {fileID: 599108338}
+  - {fileID: 469692033}
+  - {fileID: 67848197}
+  - {fileID: 446564027}
+  - {fileID: 257356971}
+  - {fileID: 1531483226}
+  - {fileID: 1325010492}
+  - {fileID: 1831800405}
+  - {fileID: 1804073404}
+  - {fileID: 776432666}
+  - {fileID: 1559225122}
+  - {fileID: 1649183820}
+  - {fileID: 250235821}
   lapTrackingStarted: 0
   nextCheckpointIndex: 0
   completedLaps: 0
+  checkpointsPassed: 0
+  finishTime: 0
   finished: 1
 --- !u!114 &1920066590
 MonoBehaviour:

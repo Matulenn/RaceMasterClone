@@ -24,16 +24,17 @@ public class RaceStandings : MonoBehaviour
     private readonly StringBuilder textBuilder =
         new StringBuilder();
 
+    private bool initialized;
+
     private void Awake()
     {
+        initialized = false;
+
         if (checkpoints == null || checkpoints.Length < 2)
         {
-            Debug.LogError(
-                "RaceStandings: Priraď checkpointy v poradí.",
-                this
+            DisableWithError(
+                "Priraď checkpointy v poradí."
             );
-
-            enabled = false;
             return;
         }
 
@@ -41,55 +42,66 @@ public class RaceStandings : MonoBehaviour
         {
             if (checkpoint == null)
             {
-                Debug.LogError(
-                    "RaceStandings: Niektorý checkpoint chýba.",
-                    this
+                DisableWithError(
+                    "Niektorý checkpoint chýba."
                 );
-
-                enabled = false;
                 return;
             }
         }
 
         if (racers == null || racers.Length == 0)
         {
-            Debug.LogError(
-                "RaceStandings: Priraď pretekárov.",
-                this
+            DisableWithError(
+                "Priraď pretekárov."
             );
-
-            enabled = false;
             return;
         }
 
+        // Najprv overíme všetkých pretekárov.
         foreach (RaceProgress racer in racers)
         {
-            if (racer == null || orderedRacers.Contains(racer))
-                continue;
+            if (racer == null)
+            {
+                DisableWithError(
+                    "Zoznam pretekárov obsahuje prázdnu položku."
+                );
+                return;
+            }
+
+            if (orderedRacers.Contains(racer))
+            {
+                DisableWithError(
+                    $"{racer.name} je v zozname viackrát."
+                );
+                return;
+            }
 
             if (racer.CheckpointCount != checkpoints.Length)
             {
-                Debug.LogError(
+                DisableWithError(
                     $"{racer.name}: Checkpoint Count sa nezhoduje " +
-                    "s počtom checkpointov v RaceStandings.",
-                    racer
+                    "s počtom checkpointov v RaceStandings."
                 );
-
-                enabled = false;
                 return;
             }
 
             orderedRacers.Add(racer);
         }
 
+        // Udalosti pripájame až po úspešnom overení.
         foreach (RaceProgress racer in orderedRacers)
         {
             racer.FinishedRace += HandleRacerFinished;
         }
+
+        initialized = true;
     }
 
     private void OnDestroy()
     {
+        if (!initialized)
+            return;
+
         foreach (RaceProgress racer in orderedRacers)
         {
             if (racer != null)
@@ -101,6 +113,9 @@ public class RaceStandings : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (!initialized)
+            return;
+
         orderedRacers.Sort(CompareRacers);
         UpdateText();
     }
@@ -168,7 +183,7 @@ public class RaceStandings : MonoBehaviour
         if (comparison != 0)
             return comparison;
 
-        // Stabilné poradie pri úplnej zhode.
+        // Pri úplnej zhode rozhoduje pôvodné poradie v poli.
         return GetConfiguredIndex(a).CompareTo(
             GetConfiguredIndex(b)
         );
@@ -186,7 +201,7 @@ public class RaceStandings : MonoBehaviour
             : next - 1;
     }
 
-    private float GetSegmentProgress(RaceProgress racer)
+    private float GetRawSegmentProgress(RaceProgress racer)
     {
         int next = racer.NextCheckpointIndex;
 
@@ -206,12 +221,15 @@ public class RaceStandings : MonoBehaviour
         if (segment.sqrMagnitude < 0.0001f)
             return 0f;
 
-        float progress = Vector3.Dot(
+        return Vector3.Dot(
             position - start,
             segment
         ) / segment.sqrMagnitude;
+    }
 
-        return Mathf.Clamp01(progress);
+    private float GetSegmentProgress(RaceProgress racer)
+    {
+        return GetRawSegmentProgress(racer);
     }
 
     private int GetConfiguredIndex(RaceProgress racer)
@@ -259,5 +277,82 @@ public class RaceStandings : MonoBehaviour
         }
 
         standingsText.text = textBuilder.ToString();
+    }
+
+    [ContextMenu("Debug Standings")]
+    private void DebugStandings()
+    {
+        if (!Application.isPlaying || !initialized)
+        {
+            Debug.LogWarning(
+                "RaceStandings: Diagnostiku spusti počas Play " +
+                "po úspešnej inicializácii.",
+                this
+            );
+            return;
+        }
+
+        // Zoradíme aj pri ručnom spustení počas pauzy.
+        orderedRacers.Sort(CompareRacers);
+
+        StringBuilder debugBuilder = new StringBuilder();
+
+        debugBuilder.AppendLine(
+            "========== DEBUG STANDINGS =========="
+        );
+
+        for (int i = 0; i < orderedRacers.Count; i++)
+        {
+            RaceProgress racer = orderedRacers[i];
+
+            int next = racer.NextCheckpointIndex;
+
+            int previous =
+                (next - 1 + checkpoints.Length) % checkpoints.Length;
+
+            float rawProgress = GetRawSegmentProgress(racer);
+            float clampedProgress = Mathf.Clamp01(rawProgress);
+
+            string finishPlace =
+                finishPlaces.TryGetValue(racer, out int place)
+                    ? place.ToString()
+                    : "-";
+
+            debugBuilder.AppendLine(
+                $"{i + 1}. {racer.name} | " +
+                $"ConfiguredIndex={GetConfiguredIndex(racer)} | " +
+                $"Laps={racer.CompletedLaps} | " +
+                $"Started={racer.LapTrackingStarted} | " +
+                $"PreviousCP={previous} | " +
+                $"NextCP={next} | " +
+                $"PassedInLap={GetPassedCheckpointCount(racer)} | " +
+                $"RawProgress={rawProgress:F6} | " +
+                $"ClampedProgress={clampedProgress:F6} | " +
+                $"Finished={racer.Finished} | " +
+                $"FinishPlace={finishPlace}"
+            );
+
+            debugBuilder.AppendLine(
+                $"    Position={racer.transform.position.ToString("F3")} | " +
+                $"Segment={checkpoints[previous].name}" +
+                $" -> {checkpoints[next].name}"
+            );
+        }
+
+        debugBuilder.AppendLine(
+            "====================================="
+        );
+
+        Debug.Log(debugBuilder.ToString(), this);
+    }
+
+    private void DisableWithError(string message)
+    {
+        Debug.LogError(
+            $"RaceStandings: {message}",
+            this
+        );
+
+        enabled = false;
     }
 }
