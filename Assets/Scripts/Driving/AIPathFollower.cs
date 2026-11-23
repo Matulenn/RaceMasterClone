@@ -21,7 +21,10 @@ public class AIPathFollower : MonoBehaviour
 
     [Header("Driving Line")]
     [Tooltip("Záporné = vľavo, kladné = vpravo v smere jazdy.")]
-    [SerializeField] private float laneOffset = 0f;
+    [SerializeField] private float laneOffset;
+
+    [SerializeField, Min(0.1f)]
+    private float laneChangeSpeed = 1f;
 
     [SerializeField] private Color pathColor = Color.magenta;
 
@@ -30,9 +33,26 @@ public class AIPathFollower : MonoBehaviour
     [SerializeField, Min(0.1f)]
     private float finishBraking = 10f;
 
+    [Header("Catch Up")]
+    [SerializeField] private RaceCatchUp catchUp;
+
+    [Header("Runtime Status")]
+    [SerializeField] private bool raceStarted;
+    [SerializeField] private float currentLaneOffset;
+    [SerializeField] private float targetLaneOffset;
+    [SerializeField] private float requestedSpeed;
+    [SerializeField] private float allowedSpeed;
+
     private Rigidbody rb;
     private RaceProgress raceProgress;
-    private bool raceStarted = false;
+    private AITrafficAwareness trafficAwareness;
+    private AILaneChanger laneChanger;
+    private AICollisionReaction collisionReaction;
+
+    public bool CanReactToImpact =>
+        isActiveAndEnabled &&
+        raceStarted &&
+        (raceProgress == null || !raceProgress.Finished);
 
     public void SetRaceStarted(bool started)
     {
@@ -42,7 +62,14 @@ public class AIPathFollower : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
         raceProgress = GetComponent<RaceProgress>();
+        trafficAwareness = GetComponent<AITrafficAwareness>();
+        laneChanger = GetComponent<AILaneChanger>();
+        collisionReaction = GetComponent<AICollisionReaction>();
+
+        currentLaneOffset = laneOffset;
+        targetLaneOffset = laneOffset;
     }
 
     private void Start()
@@ -50,7 +77,8 @@ public class AIPathFollower : MonoBehaviour
         if (path == null || path.PointCount < 2)
         {
             Debug.LogError(
-                "AI potrebuje priradenú trasu aspoň s dvomi bodmi.",
+                $"{name}: AI potrebuje priradenú trasu " +
+                "aspoň s dvomi bodmi.",
                 this
             );
 
@@ -72,20 +100,25 @@ public class AIPathFollower : MonoBehaviour
                 this
             );
         }
+
+        if (collisionReaction == null)
+        {
+            Debug.LogWarning(
+                $"{name}: Chýba AICollisionReaction. " +
+                "AI bude jazdiť bez reakcie na náraz.",
+                this
+            );
+        }
     }
 
     private void FixedUpdate()
     {
-        // Pred odpočítaním AI čaká.
-        if (!raceStarted)
+        if (!raceStarted ||
+            (raceProgress != null && raceProgress.Finished))
         {
-            BrakeAfterFinish();
-            return;
-        }
+            requestedSpeed = 0f;
+            allowedSpeed = 0f;
 
-        // Po dokončení svojich kôl AI zabrzdí.
-        if (raceProgress != null && raceProgress.Finished)
-        {
             BrakeAfterFinish();
             return;
         }
@@ -93,13 +126,39 @@ public class AIPathFollower : MonoBehaviour
         if (path == null || path.PointCount < 2)
             return;
 
-        currentPointIndex %= path.PointCount;
+        currentPointIndex = Mathf.Clamp(
+            currentPointIndex,
+            0,
+            path.PointCount - 1
+        );
+
+        float normalMultiplier =
+            catchUp != null && raceProgress != null
+                ? catchUp.GetMultiplier(raceProgress)
+                : 1f;
+
+        float impactMultiplier =
+            collisionReaction != null
+                ? collisionReaction.SpeedMultiplier
+                : 1f;
+
+        // Spomalenie alebo bonus po náraze má prednosť.
+        // Dva bonusy sa medzi sebou nenásobia.
+        float effectiveMultiplier =
+            !Mathf.Approximately(impactMultiplier, 1f)
+                ? impactMultiplier
+                : normalMultiplier;
+
+        requestedSpeed =
+            moveSpeed * Mathf.Max(0f, effectiveMultiplier);
+
+        UpdateDrivingLane(requestedSpeed);
 
         Vector3 toTarget = GetHorizontalTargetDirection();
         int checkedPoints = 0;
 
-        // Preskočí dosiahnuté alebo veľmi blízke body.
-        while (toTarget.magnitude <= reachDistance &&
+        while (toTarget.sqrMagnitude <=
+                   reachDistance * reachDistance &&
                checkedPoints < path.PointCount)
         {
             currentPointIndex =
@@ -109,9 +168,34 @@ public class AIPathFollower : MonoBehaviour
             checkedPoints++;
         }
 
-        // Nespomaľuje pri približovaní ku každému bodu.
+        if (toTarget.sqrMagnitude < 0.0001f)
+        {
+            allowedSpeed = 0f;
+            BrakeAfterFinish();
+            return;
+        }
+
+        Vector3 driveDirection = toTarget.normalized;
+
+        allowedSpeed = requestedSpeed;
+
+        if (trafficAwareness != null &&
+            trafficAwareness.isActiveAndEnabled)
+        {
+            allowedSpeed = trafficAwareness.GetAllowedSpeed(
+                requestedSpeed,
+                driveDirection
+            );
+        }
+
+        allowedSpeed = Mathf.Clamp(
+            allowedSpeed,
+            0f,
+            requestedSpeed
+        );
+
         Vector3 desiredVelocity =
-            toTarget.normalized * moveSpeed;
+            driveDirection * allowedSpeed;
 
         Vector3 velocity = GetBodyVelocity();
 
@@ -132,6 +216,54 @@ public class AIPathFollower : MonoBehaviour
         );
     }
 
+    private void UpdateDrivingLane(float desiredSpeed)
+    {
+        int count = path.PointCount;
+
+        int previous =
+            (currentPointIndex - 1 + count) % count;
+
+        int next =
+            (currentPointIndex + 1) % count;
+
+        Vector3 forward =
+            path.GetPoint(next) - path.GetPoint(previous);
+
+        forward.y = 0f;
+
+        if (forward.sqrMagnitude < 0.0001f)
+        {
+            forward =
+                path.GetPoint(next) -
+                path.GetPoint(currentPointIndex);
+
+            forward.y = 0f;
+        }
+
+        if (laneChanger != null &&
+            laneChanger.isActiveAndEnabled &&
+            forward.sqrMagnitude >= 0.0001f)
+        {
+            targetLaneOffset = laneChanger.ChooseOffset(
+                path.GetPoint(currentPointIndex),
+                forward,
+                currentLaneOffset,
+                targetLaneOffset,
+                desiredSpeed
+            );
+        }
+        else
+        {
+            targetLaneOffset = laneOffset;
+        }
+
+        currentLaneOffset = Mathf.MoveTowards(
+            currentLaneOffset,
+            targetLaneOffset,
+            laneChangeSpeed * Time.fixedDeltaTime
+        );
+    }
+
     private void BrakeAfterFinish()
     {
         Vector3 velocity = GetBodyVelocity();
@@ -144,7 +276,6 @@ public class AIPathFollower : MonoBehaviour
             finishBraking * Time.fixedDeltaTime
         );
 
-        // Zvislý pohyb zostáva na gravitácii a kolíziách.
         rb.AddForce(
             velocityChange,
             ForceMode.VelocityChange
@@ -175,7 +306,6 @@ public class AIPathFollower : MonoBehaviour
 
         forward.y = 0f;
 
-        // Záloha pri zhodných susedných bodoch.
         if (forward.sqrMagnitude < 0.0001f)
         {
             forward = path.GetPoint(nextIndex) - current;
@@ -190,7 +320,12 @@ public class AIPathFollower : MonoBehaviour
             forward.normalized
         ).normalized;
 
-        return current + right * laneOffset;
+        float offset =
+            Application.isPlaying
+                ? currentLaneOffset
+                : laneOffset;
+
+        return current + right * offset;
     }
 
     private Vector3 GetHorizontalTargetDirection()
